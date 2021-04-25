@@ -35,8 +35,8 @@ stateplot  <-  ggplot(data=stateconflicts, aes(x=year, y=count)) +
                 geom_point() +
                 # theme(panel.grid.major = element_blank(), 
                 #       panel.grid.minor = element_blank()) +
-                ylab("Global armed conflicts (state)") + xlab("Year")#+
-                # geom_smooth()
+                ylab("Global armed conflicts (state)") + xlab("Year") +
+                geom_smooth()
                 # geom_smooth(aes(colour="LOESS"))+
                 # scale_colour_manual(name="legend", values=c("red"))
 print(stateplot)
@@ -70,8 +70,8 @@ nonstateplot <- ggplot(data=nonstateconflicts, aes(x=year, y=count)) +
                 geom_point() +
                 # theme(panel.grid.major = element_blank(), 
                 #       panel.grid.minor = element_blank()) +
-                ylab("Global armed conflicts (non-state)") + xlab("Year")#+
-                # geom_smooth()
+                ylab("Global armed conflicts (non-state)") + xlab("Year") +
+                geom_smooth()
                 # geom_smooth(aes(colour="LOESS"))+
                 # scale_colour_manual(name="legend", values=c("red"))
 print(nonstateplot)
@@ -95,8 +95,8 @@ anomalyplot <-  ggplot(data=temps, aes(x=year, y=temp)) +
                 geom_point() +
                 # theme(panel.grid.major = element_blank(), 
                 #       panel.grid.minor = element_blank()) +
-                ylab("Mean global temperature anomaly [deg C]") + xlab("Year") #+
-                # geom_smooth()
+                ylab("Mean global temperature anomaly [deg C]") + xlab("Year") +
+                geom_smooth()
                 # geom_smooth(aes(colour="LOESS"))+
                 # scale_colour_manual(name="legend", values=c("red"))
 print(anomalyplot)
@@ -110,7 +110,7 @@ endyear <- stateconflicts$year[length(stateconflicts$year)]
 statetemps = subset(temps, year>=begyear&year<=endyear) # trim to desired years
 
 statecor <- cor.test(x=stateconflicts$count,y=statetemps$temp
-                     ,method="spearman", exact=FALSE)
+                     ,method="pearson", exact=FALSE)
 
 stateplotdata <- stateconflicts
 stateplotdata$temps <- statetemps$temp
@@ -121,7 +121,7 @@ statecorplot <- ggplot(data=stateplotdata, aes(x=temps,y=count)) +
                 ylab("Global armed conflict (state)") +
                 xlab("Mean Temperature Anomaly [deg C]") +
                 geom_smooth()
-                # geom_smooth(aes(colour="LOESS"))+
+                # geom_smooth(aes(colour="LOESS"))+ 
                 # scale_colour_manual(name="legend", values=c("red"))
 print(statecorplot)
 
@@ -137,7 +137,7 @@ endyear <- nonstateconflicts$year[length(nonstateconflicts$year)]
 nonstatetemps = subset(temps, year>=begyear&year<=endyear) # trim to desired years
 
 nonstatecor <- cor.test(x=nonstateconflicts$count,y=nonstatetemps$temp
-                     ,method="spearman", exact=FALSE)
+                     ,method="pearson", exact=FALSE)
 
 nonstateplotdata <- nonstateconflicts
 nonstateplotdata$temps <- nonstatetemps$temp
@@ -154,6 +154,6 @@ print(nonstatecorplot)
 
 ##############################################################
 # grid arrange for plots
-grid.arrange(stateplot,nonstateplot,anomalyplot,ncol=3)
+grid.arrange(stateplot,nonstateplot,anomalyplot,ncol=2,nrow=2)
 
 grid.arrange(statecorplot,nonstatecorplot,ncol=2)
