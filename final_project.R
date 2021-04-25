@@ -3,6 +3,7 @@ graphics.off()
 
 library(ggplot2)
 library(gridExtra)
+library(ggpmisc)
 # library(GGally)
 # library(PerformanceAnalytics)
 
@@ -112,21 +113,11 @@ statetemps = subset(temps, year>=begyear&year<=endyear) # trim to desired years
 statecor <- cor.test(x=stateconflicts$count,y=statetemps$temp
                      ,method="pearson", exact=FALSE)
 
+# pearson's correlation
 stateplotdata <- stateconflicts
 stateplotdata$temps <- statetemps$temp
 stateplotdata <- subset (stateplotdata, select = -year)
 
-statecorplot <- ggplot(data=stateplotdata, aes(x=temps,y=count)) +
-                geom_point() +
-                ylab("Global armed conflict (state)") +
-                xlab("Mean Temperature Anomaly [deg C]") +
-                geom_smooth()
-                # geom_smooth(aes(colour="LOESS"))+ 
-                # scale_colour_manual(name="legend", values=c("red"))
-print(statecorplot)
-
-# ggpairs(stateplotdata)
-# chart.Correlation(stateplotdata)
 
 ##############################################################
 # Correlation between temperature anomaly and state conflicts
@@ -136,6 +127,7 @@ begyear <- nonstateconflicts$year[1]
 endyear <- nonstateconflicts$year[length(nonstateconflicts$year)]
 nonstatetemps = subset(temps, year>=begyear&year<=endyear) # trim to desired years
 
+# pearson's correlation
 nonstatecor <- cor.test(x=nonstateconflicts$count,y=nonstatetemps$temp
                      ,method="pearson", exact=FALSE)
 
@@ -143,17 +135,75 @@ nonstateplotdata <- nonstateconflicts
 nonstateplotdata$temps <- nonstatetemps$temp
 nonstateplotdata <- subset (nonstateplotdata, select = -year)
 
+##############################################################
+# linear regressions
+
+
+# state
+statecordata <- stateconflicts
+statecordata[,3] <- statetemps$temp
+names(statecordata) <- c("year","conflicts","temps")
+linear_state <- lm(conflicts~temps,data=statecordata) # linear regression
+summary(linear_state)
+
+my.formula <- y ~ x
+p_linear <- ggplot(data = statecordata, aes(x = temps, y = conflicts)) +
+  geom_smooth(method = "lm", se=FALSE, color="red", formula = my.formula) +
+  stat_poly_eq(formula = my.formula, 
+               aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+               parse = TRUE) +         
+  ylab("Global armed conflict (state)") +
+  xlab("Mean Temperature Anomaly [deg C]") +
+  geom_point()
+print(p_linear)
+
+
+# nonstate
+nonstatecordata <- nonstateconflicts
+nonstatecordata[,3] <- nonstatetemps$temp
+names(nonstatecordata) <- c("year","conflicts","temps")
+nonlinear_state <- lm(conflicts~temps,data=nonstatecordata) # linear regression
+summary(nonlinear_state)
+
+my.formula <- y ~ x
+p_nonlinear <- ggplot(data = nonstatecordata, aes(x = temps, y = conflicts)) +
+  geom_smooth(method = "lm", se=FALSE, color="red", formula = my.formula) +
+  stat_poly_eq(formula = my.formula, 
+               aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+               parse = TRUE) +   
+
+  ylab("Global armed conflict (non-state)") + 
+  xlab("Mean Temperature Anomaly [deg C]") +
+  geom_point()
+print(p_nonlinear)
+
+##############################################################
+# plots
+
+# state
+statecorplot <- ggplot(data=stateplotdata, aes(x=temps,y=count)) +
+  geom_point() +
+  ylab("Global armed conflict (state)") +
+  xlab("Mean Temperature Anomaly [deg C]") +
+  # geom_smooth()
+  geom_abline(intercept = 26.400, slope = 25.249, color="red")
+# geom_smooth(aes(colour="LOESS"))+ 
+# scale_colour_manual(name="legend", values=c("red"))
+print(statecorplot)
+
+# non-state
 nonstatecorplot <- ggplot(data=nonstateplotdata, aes(x=temps,y=count)) +
   geom_point() +
   ylab("Global armed conflict (non-state)") + 
   xlab("Mean Temperature Anomaly [deg C]") +
-  geom_smooth()
-  # geom_smooth(aes(colour="LOESS"))+
-  # scale_colour_manual(name="legend", values=c("red"))
+  geom_abline(intercept = 1.464, slope = 67.564, color="red")
+# geom_smooth()
+# geom_smooth(aes(colour="LOESS"))+
+# scale_colour_manual(name="legend", values=c("red"))
 print(nonstatecorplot)
 
 ##############################################################
 # grid arrange for plots
 grid.arrange(stateplot,nonstateplot,anomalyplot,ncol=2,nrow=2)
 
-grid.arrange(statecorplot,nonstatecorplot,ncol=2)
+grid.arrange(p_linear,p_nonlinear,ncol=2)
