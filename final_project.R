@@ -145,6 +145,7 @@ statecordata[,3] <- statetemps$temp
 names(statecordata) <- c("year","conflicts","temps")
 linear_state <- lm(conflicts~temps,data=statecordata) # linear regression
 summary(linear_state)
+anova(linear_state)
 
 my.formula <- y ~ x
 p_linear <- ggplot(data = statecordata, aes(x = temps, y = conflicts)) +
@@ -164,6 +165,7 @@ nonstatecordata[,3] <- nonstatetemps$temp
 names(nonstatecordata) <- c("year","conflicts","temps")
 nonlinear_state <- lm(conflicts~temps,data=nonstatecordata) # linear regression
 summary(nonlinear_state)
+anova(nonlinear_state)
 
 my.formula <- y ~ x
 p_nonlinear <- ggplot(data = nonstatecordata, aes(x = temps, y = conflicts)) +
