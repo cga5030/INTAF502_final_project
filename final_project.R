@@ -163,12 +163,12 @@ print(p_linear)
 nonstatecordata <- nonstateconflicts
 nonstatecordata[,3] <- nonstatetemps$temp
 names(nonstatecordata) <- c("year","conflicts","temps")
-nonlinear_state <- lm(conflicts~temps,data=nonstatecordata) # linear regression
-summary(nonlinear_state)
-anova(nonlinear_state)
+linear_nonstate <- lm(conflicts~temps,data=nonstatecordata) # linear regression
+summary(linear_nonstate)
+anova(linear_nonstate)
 
 my.formula <- y ~ x
-p_nonlinear <- ggplot(data = nonstatecordata, aes(x = temps, y = conflicts)) +
+p_linear_nonstate <- ggplot(data = nonstatecordata, aes(x = temps, y = conflicts)) +
   geom_smooth(method = "lm", se=FALSE, color="red", formula = my.formula) +
   stat_poly_eq(formula = my.formula, 
                aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
@@ -177,7 +177,7 @@ p_nonlinear <- ggplot(data = nonstatecordata, aes(x = temps, y = conflicts)) +
   ylab("Global armed conflict (non-state)") + 
   xlab("Mean Temperature Anomaly [deg C]") +
   geom_point()
-print(p_nonlinear)
+print(p_linear_nonstate)
 
 ##############################################################
 # plots
@@ -208,4 +208,4 @@ print(nonstatecorplot)
 # grid arrange for plots
 grid.arrange(stateplot,nonstateplot,anomalyplot,ncol=2,nrow=2)
 
-grid.arrange(p_linear,p_nonlinear,ncol=2)
+grid.arrange(p_linear,p_linear_nonstate,ncol=2)
