@@ -206,6 +206,12 @@ print(nonstatecorplot)
 
 ##############################################################
 # grid arrange for plots
-grid.arrange(stateplot,nonstateplot,anomalyplot,ncol=2,nrow=2)
+# save plot to file without using ggsave
 
+png("!grid1.png")
+grid.arrange(stateplot,nonstateplot,anomalyplot,ncol=2,nrow=2)
+dev.off()
+
+png("!grid2.png")
 grid.arrange(p_linear,p_linear_nonstate,ncol=2)
+dev.off()
